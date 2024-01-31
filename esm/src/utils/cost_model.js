@@ -1,4 +1,4 @@
-import { C, } from "../core/mod.js";
+import { C } from "../core/mod.js";
 export function createCostModels(costModels) {
     const costmdls = C.Costmdls.new();
     // add plutus v1

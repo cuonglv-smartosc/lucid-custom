@@ -1,5 +1,4 @@
-import * as dntShim from "../../_dnt.shims.js";
-import { C,  } from "../core/mod.js";
+import { C } from "../core/mod.js";
 import { Data } from "../mod.js";
 import {
   Address,
@@ -662,7 +661,7 @@ async function createPoolRegistration(
   });
 
   const metadata = poolParams.metadataUrl
-    ? await dntShim.fetch(
+    ? await fetch(
       poolParams.metadataUrl,
     )
       .then((res) => res.arrayBuffer())

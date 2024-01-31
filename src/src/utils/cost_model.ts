@@ -1,4 +1,4 @@
-import { C,  } from "../core/mod.js";
+import { C } from "../core/mod.js";
 import { CostModels } from "../mod.js";
 import { ProtocolParameters } from "../types/types.js";
 

@@ -1,4 +1,4 @@
-import { C,  } from "../core/core.js";
+import { C } from "../core/core.js";
 import {
   Address,
   Assets,

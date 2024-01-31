@@ -1,4 +1,4 @@
-import { C,  } from "../core/mod.js";
+import { C } from "../core/mod.js";
 import { Transaction, TxHash } from "../types/mod.js";
 import { Lucid } from "./lucid.js";
 import { toHex } from "../utils/mod.js";

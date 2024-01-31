@@ -1,7 +1,5 @@
 // This is a partial reimplementation of BIP39 in Deno: https://github.com/bitcoinjs/bip39
 // We only use the default Wordlist (english)
-import * as dntShim from "../../_dnt.shims.js";
-
 import { Sha256 } from "../../deps/deno.land/std@0.153.0/hash/sha256.js";
 import { toHex } from "../utils/mod.js";
 
@@ -73,10 +71,10 @@ function randomBytes(size: number): Uint8Array {
       for (let generated = 0; generated < size; generated += MAX_BYTES) {
         // buffer.slice automatically checks if the end is past the end of
         // the buffer so we don't have to here
-        dntShim.crypto.getRandomValues(bytes.slice(generated, generated + MAX_BYTES));
+        crypto.getRandomValues(bytes.slice(generated, generated + MAX_BYTES));
       }
     } else {
-      dntShim.crypto.getRandomValues(bytes);
+      crypto.getRandomValues(bytes);
     }
   }
 

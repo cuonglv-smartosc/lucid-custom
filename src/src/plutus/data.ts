@@ -7,7 +7,7 @@ import {
   TSchema,
   Type,
 } from "../../deps/deno.land/x/typebox@0.25.13/src/typebox.js";
-import { C, } from "../core/mod.js";
+import { C } from "../core/mod.js";
 import { Datum, Exact, Json, Redeemer } from "../types/mod.js";
 import { fromHex, fromText, toHex } from "../utils/utils.js";
 

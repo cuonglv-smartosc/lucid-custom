@@ -1,4 +1,3 @@
-import * as dntShim from "../../_dnt.shims.js";
 import { C } from "../core/mod.js";
 import { applyDoubleCborEncoding, fromHex } from "../utils/mod.js";
 import packageJson from "../../package.js";
@@ -27,7 +26,7 @@ export class Maestro {
         this.turboSubmit = turboSubmit;
     }
     async getProtocolParameters() {
-        const timestampedResult = await dntShim.fetch(`${this.url}/protocol-params`, {
+        const timestampedResult = await fetch(`${this.url}/protocol-params`, {
             headers: this.commonHeaders(),
         }).then((res) => res.json());
         const result = timestampedResult.data;
@@ -83,7 +82,7 @@ export class Maestro {
             count: "100",
             ...(unit && { asset: unit }),
         });
-        const result = await this.getAllPagesData(async (qry) => await dntShim.fetch(qry, { headers: this.commonHeaders() }), `${this.url}${queryPredicate}/utxos`, qparams, "Location: getUtxosInternal. Error: Could not fetch UTxOs from Maestro");
+        const result = await this.getAllPagesData(async (qry) => await fetch(qry, { headers: this.commonHeaders() }), `${this.url}${queryPredicate}/utxos`, qparams, "Location: getUtxosInternal. Error: Could not fetch UTxOs from Maestro");
         return result.map(this.maestroUtxoToUtxo);
     }
     getUtxos(addressOrCredential) {
@@ -93,7 +92,7 @@ export class Maestro {
         return this.getUtxosInternal(addressOrCredential, unit);
     }
     async getUtxoByUnit(unit) {
-        const timestampedAddressesResponse = await dntShim.fetch(`${this.url}/assets/${unit}/addresses?count=2`, { headers: this.commonHeaders() });
+        const timestampedAddressesResponse = await fetch(`${this.url}/assets/${unit}/addresses?count=2`, { headers: this.commonHeaders() });
         const timestampedAddresses = await timestampedAddressesResponse.json();
         if (!timestampedAddressesResponse.ok) {
             if (timestampedAddresses.message) {
@@ -119,7 +118,7 @@ export class Maestro {
     async getUtxosByOutRef(outRefs) {
         const qry = `${this.url}/transactions/outputs`;
         const body = JSON.stringify(outRefs.map(({ txHash, outputIndex }) => `${txHash}#${outputIndex}`));
-        const utxos = await this.getAllPagesData(async (qry) => await dntShim.fetch(qry, {
+        const utxos = await this.getAllPagesData(async (qry) => await fetch(qry, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -130,7 +129,7 @@ export class Maestro {
         return utxos.map(this.maestroUtxoToUtxo);
     }
     async getDelegation(rewardAddress) {
-        const timestampedResultResponse = await dntShim.fetch(`${this.url}/accounts/${rewardAddress}`, { headers: this.commonHeaders() });
+        const timestampedResultResponse = await fetch(`${this.url}/accounts/${rewardAddress}`, { headers: this.commonHeaders() });
         if (!timestampedResultResponse.ok) {
             return { poolId: null, rewards: 0n };
         }
@@ -142,7 +141,7 @@ export class Maestro {
         };
     }
     async getDatum(datumHash) {
-        const timestampedResultResponse = await dntShim.fetch(`${this.url}/datum/${datumHash}`, {
+        const timestampedResultResponse = await fetch(`${this.url}/datum/${datumHash}`, {
             headers: this.commonHeaders(),
         });
         if (!timestampedResultResponse.ok) {
@@ -160,7 +159,7 @@ export class Maestro {
     awaitTx(txHash, checkInterval = 3000) {
         return new Promise((res) => {
             const confirmation = setInterval(async () => {
-                const isConfirmedResponse = await dntShim.fetch(`${this.url}/transactions/${txHash}/cbor`, {
+                const isConfirmedResponse = await fetch(`${this.url}/transactions/${txHash}/cbor`, {
                     headers: this.commonHeaders(),
                 });
                 if (isConfirmedResponse.ok) {
@@ -175,7 +174,7 @@ export class Maestro {
     async submitTx(tx) {
         let queryUrl = `${this.url}/txmanager`;
         queryUrl += this.turboSubmit ? "/turbosubmit" : "";
-        const response = await dntShim.fetch(queryUrl, {
+        const response = await fetch(queryUrl, {
             method: "POST",
             headers: {
                 "Content-Type": "application/cbor",

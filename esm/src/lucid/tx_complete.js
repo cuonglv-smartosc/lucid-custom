@@ -1,4 +1,4 @@
-import { C, } from "../core/mod.js";
+import { C } from "../core/mod.js";
 import { TxSigned } from "./tx_signed.js";
 import { fromHex, toHex } from "../utils/mod.js";
 export class TxComplete {

@@ -1,4 +1,4 @@
-import { C, } from "../core/core.js";
+import { C } from "../core/core.js";
 import { PROTOCOL_PARAMETERS_DEFAULT } from "../utils/mod.js";
 import { coreToUtxo, fromHex, getAddressDetails, toHex, } from "../utils/utils.js";
 export class Emulator {

@@ -1,4 +1,4 @@
-import { C,  } from "../core/mod.js";
+import { C } from "../core/mod.js";
 import {
   PrivateKey,
   Transaction,

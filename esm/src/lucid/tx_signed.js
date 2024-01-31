@@ -1,4 +1,4 @@
-import { C, } from "../core/mod.js";
+import { C } from "../core/mod.js";
 import { toHex } from "../utils/mod.js";
 export class TxSigned {
     constructor(lucid, tx) {

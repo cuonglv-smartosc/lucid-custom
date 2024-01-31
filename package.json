@@ -2,7 +2,7 @@
   "module": "./esm/mod.js",
   "main": "./esm/mod.js",
   "types": "./types/mod.d.ts",
-  "name": "lucid-cjs",
+  "name": "lucid-custom",
   "version": "0.10.7",
   "license": "MIT",
   "author": "Alessandro Konrad",
@@ -12,20 +12,15 @@
     "node": ">=14"
   },
   "dependencies": {
-    "@deno/shim-crypto": "~0.3.1",
-    "undici": "^5.8.0",
-    "ws": "^8.10.0",
     "node-fetch": "^3.2.3",
-    "@peculiar/webcrypto": "^1.4.0"
+    "@peculiar/webcrypto": "^1.4.0",
+    "ws": "^8.10.0"
   },
+  "type": "module",
   "exports": {
     ".": {
       "import": "./esm/mod.js",
-      "require": "./script/mod.js",
       "types": "./types/mod.d.ts"
     }
-  },
-  "devDependencies": {
-    "@types/node": "16.11.37"
   }
 }

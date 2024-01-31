@@ -1,4 +1,3 @@
-import * as dntShim from "../../_dnt.shims.js";
 import { C } from "../core/mod.js";
 import { applyDoubleCborEncoding, fromHex } from "../utils/mod.js";
 import {
@@ -40,7 +39,7 @@ export class Maestro implements Provider {
   }
 
   async getProtocolParameters(): Promise<ProtocolParameters> {
-    const timestampedResult = await dntShim.fetch(`${this.url}/protocol-params`, {
+    const timestampedResult = await fetch(`${this.url}/protocol-params`, {
       headers: this.commonHeaders(),
     }).then((res) => res.json());
     const result = timestampedResult.data;
@@ -110,7 +109,7 @@ export class Maestro implements Provider {
     });
     const result: MaestroUtxos = await this.getAllPagesData(
       async (qry: string) =>
-        await dntShim.fetch(qry, { headers: this.commonHeaders() }),
+        await fetch(qry, { headers: this.commonHeaders() }),
       `${this.url}${queryPredicate}/utxos`,
       qparams,
       "Location: getUtxosInternal. Error: Could not fetch UTxOs from Maestro",
@@ -130,7 +129,7 @@ export class Maestro implements Provider {
   }
 
   async getUtxoByUnit(unit: Unit): Promise<UTxO> {
-    const timestampedAddressesResponse = await dntShim.fetch(
+    const timestampedAddressesResponse = await fetch(
       `${this.url}/assets/${unit}/addresses?count=2`,
       { headers: this.commonHeaders() },
     );
@@ -174,7 +173,7 @@ export class Maestro implements Provider {
     );
     const utxos = await this.getAllPagesData<MaestroUtxo>(
       async (qry: string) =>
-        await dntShim.fetch(qry, {
+        await fetch(qry, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -190,7 +189,7 @@ export class Maestro implements Provider {
   }
 
   async getDelegation(rewardAddress: RewardAddress): Promise<Delegation> {
-    const timestampedResultResponse = await dntShim.fetch(
+    const timestampedResultResponse = await fetch(
       `${this.url}/accounts/${rewardAddress}`,
       { headers: this.commonHeaders() },
     );
@@ -206,7 +205,7 @@ export class Maestro implements Provider {
   }
 
   async getDatum(datumHash: DatumHash): Promise<Datum> {
-    const timestampedResultResponse = await dntShim.fetch(
+    const timestampedResultResponse = await fetch(
       `${this.url}/datum/${datumHash}`,
       {
         headers: this.commonHeaders(),
@@ -229,7 +228,7 @@ export class Maestro implements Provider {
   awaitTx(txHash: TxHash, checkInterval = 3000): Promise<boolean> {
     return new Promise((res) => {
       const confirmation = setInterval(async () => {
-        const isConfirmedResponse = await dntShim.fetch(
+        const isConfirmedResponse = await fetch(
           `${this.url}/transactions/${txHash}/cbor`,
           {
             headers: this.commonHeaders(),
@@ -248,7 +247,7 @@ export class Maestro implements Provider {
   async submitTx(tx: Transaction): Promise<TxHash> {
     let queryUrl = `${this.url}/txmanager`;
     queryUrl += this.turboSubmit ? "/turbosubmit" : "";
-    const response = await dntShim.fetch(queryUrl, {
+    const response = await fetch(queryUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/cbor",
@@ -299,7 +298,7 @@ export class Maestro implements Provider {
     };
   }
   private async getAllPagesData<T>(
-    getResponse: (qry: string) => Promise<dntShim.Response>,
+    getResponse: (qry: string) => Promise<Response>,
     qry: string,
     paramsGiven: URLSearchParams,
     errorMsg: string,

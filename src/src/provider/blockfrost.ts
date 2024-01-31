@@ -1,5 +1,4 @@
-import * as dntShim from "../../_dnt.shims.js";
-import { C,  } from "../core/mod.js";
+import { C } from "../core/mod.js";
 import { applyDoubleCborEncoding, fromHex, toHex } from "../utils/mod.js";
 import {
   Address,
@@ -28,7 +27,7 @@ export class Blockfrost implements Provider {
   }
 
   async getProtocolParameters(): Promise<ProtocolParameters> {
-    const result = await dntShim.fetch(`${this.url}/epochs/latest/parameters`, {
+    const result = await fetch(`${this.url}/epochs/latest/parameters`, {
       headers: { project_id: this.projectId, lucid },
     }).then((res) => res.json());
 
@@ -66,7 +65,7 @@ export class Blockfrost implements Provider {
     let page = 1;
     while (true) {
       const pageResult: BlockfrostUtxoResult | BlockfrostUtxoError =
-        await dntShim.fetch(
+        await fetch(
           `${this.url}/addresses/${queryPredicate}/utxos?page=${page}`,
           { headers: { project_id: this.projectId, lucid } },
         ).then((res) => res.json());
@@ -104,7 +103,7 @@ export class Blockfrost implements Provider {
     let page = 1;
     while (true) {
       const pageResult: BlockfrostUtxoResult | BlockfrostUtxoError =
-        await dntShim.fetch(
+        await fetch(
           `${this.url}/addresses/${queryPredicate}/utxos/${unit}?page=${page}`,
           { headers: { project_id: this.projectId, lucid } },
         ).then((res) => res.json());
@@ -124,7 +123,7 @@ export class Blockfrost implements Provider {
   }
 
   async getUtxoByUnit(unit: Unit): Promise<UTxO> {
-    const addresses = await dntShim.fetch(
+    const addresses = await fetch(
       `${this.url}/assets/${unit}/addresses?count=2`,
       { headers: { project_id: this.projectId, lucid } },
     ).then((res) => res.json());
@@ -151,7 +150,7 @@ export class Blockfrost implements Provider {
     // TODO: Make sure old already spent UTxOs are not retrievable.
     const queryHashes = [...new Set(outRefs.map((outRef) => outRef.txHash))];
     const utxos = await Promise.all(queryHashes.map(async (txHash) => {
-      const result = await dntShim.fetch(
+      const result = await fetch(
         `${this.url}/txs/${txHash}/utxos`,
         { headers: { project_id: this.projectId, lucid } },
       ).then((res) => res.json());
@@ -176,7 +175,7 @@ export class Blockfrost implements Provider {
   }
 
   async getDelegation(rewardAddress: RewardAddress): Promise<Delegation> {
-    const result = await dntShim.fetch(
+    const result = await fetch(
       `${this.url}/accounts/${rewardAddress}`,
       { headers: { project_id: this.projectId, lucid } },
     ).then((res) => res.json());
@@ -190,7 +189,7 @@ export class Blockfrost implements Provider {
   }
 
   async getDatum(datumHash: DatumHash): Promise<Datum> {
-    const datum = await dntShim.fetch(
+    const datum = await fetch(
       `${this.url}/scripts/datum/${datumHash}/cbor`,
       {
         headers: { project_id: this.projectId, lucid },
@@ -207,7 +206,7 @@ export class Blockfrost implements Provider {
   awaitTx(txHash: TxHash, checkInterval = 3000): Promise<boolean> {
     return new Promise((res) => {
       const confirmation = setInterval(async () => {
-        const isConfirmed = await dntShim.fetch(`${this.url}/txs/${txHash}`, {
+        const isConfirmed = await fetch(`${this.url}/txs/${txHash}`, {
           headers: { project_id: this.projectId, lucid },
         }).then((res) => res.json());
         if (isConfirmed && !isConfirmed.error) {
@@ -220,7 +219,7 @@ export class Blockfrost implements Provider {
   }
 
   async submitTx(tx: Transaction): Promise<TxHash> {
-    const result = await dntShim.fetch(`${this.url}/tx/submit`, {
+    const result = await fetch(`${this.url}/tx/submit`, {
       method: "POST",
       headers: {
         "Content-Type": "application/cbor",
@@ -253,7 +252,7 @@ export class Blockfrost implements Provider {
           ? (await (async () => {
             const {
               type,
-            } = await dntShim.fetch(
+            } = await fetch(
               `${this.url}/scripts/${r.reference_script_hash}`,
               {
                 headers: { project_id: this.projectId, lucid },
@@ -263,7 +262,7 @@ export class Blockfrost implements Provider {
             if (type === "Native" || type === "native") {
               throw new Error("Native script ref not implemented!");
             }
-            const { cbor: script } = await dntShim.fetch(
+            const { cbor: script } = await fetch(
               `${this.url}/scripts/${r.reference_script_hash}/cbor`,
               { headers: { project_id: this.projectId, lucid } },
             ).then((res) => res.json());

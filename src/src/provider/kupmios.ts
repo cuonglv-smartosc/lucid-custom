@@ -1,4 +1,3 @@
-import * as dntShim from "../../_dnt.shims.js";
 import {
   Address,
   Assets,
@@ -84,7 +83,7 @@ export class Kupmios implements Provider {
     const queryPredicate = isAddress
       ? addressOrCredential
       : addressOrCredential.hash;
-    const result = await dntShim.fetch(
+    const result = await fetch(
       `${this.kupoUrl}/matches/${queryPredicate}${
         isAddress ? "" : "/*"
       }?unspent`,
@@ -102,7 +101,7 @@ export class Kupmios implements Provider {
       ? addressOrCredential
       : addressOrCredential.hash;
     const { policyId, assetName } = fromUnit(unit);
-    const result = await dntShim.fetch(
+    const result = await fetch(
       `${this.kupoUrl}/matches/${queryPredicate}${
         isAddress ? "" : "/*"
       }?unspent&policy_id=${policyId}${
@@ -115,7 +114,7 @@ export class Kupmios implements Provider {
 
   async getUtxoByUnit(unit: Unit): Promise<UTxO> {
     const { policyId, assetName } = fromUnit(unit);
-    const result = await dntShim.fetch(
+    const result = await fetch(
       `${this.kupoUrl}/matches/${policyId}.${
         assetName ? `${assetName}` : "*"
       }?unspent`,
@@ -135,7 +134,7 @@ export class Kupmios implements Provider {
     const queryHashes = [...new Set(outRefs.map((outRef) => outRef.txHash))];
 
     const utxos = await Promise.all(queryHashes.map(async (txHash) => {
-      const result = await dntShim.fetch(
+      const result = await fetch(
         `${this.kupoUrl}/matches/*@${txHash}?unspent`,
       ).then((res) => res.json());
       return this.kupmiosUtxosToUtxos(result);
@@ -176,7 +175,7 @@ export class Kupmios implements Provider {
   }
 
   async getDatum(datumHash: DatumHash): Promise<Datum> {
-    const result = await dntShim.fetch(
+    const result = await fetch(
       `${this.kupoUrl}/datums/${datumHash}`,
     ).then((res) => res.json());
     if (!result || !result.datum) {
@@ -188,7 +187,7 @@ export class Kupmios implements Provider {
   awaitTx(txHash: TxHash, checkInterval = 3000): Promise<boolean> {
     return new Promise((res) => {
       const confirmation = setInterval(async () => {
-        const isConfirmed = await dntShim.fetch(
+        const isConfirmed = await fetch(
           `${this.kupoUrl}/matches/*@${txHash}?unspent`,
         ).then((res) => res.json());
         if (isConfirmed && isConfirmed.length > 0) {
@@ -243,7 +242,7 @@ export class Kupmios implements Provider {
             const {
               script,
               language,
-            } = await dntShim.fetch(
+            } = await fetch(
               `${this.kupoUrl}/scripts/${utxo.script_hash}`,
             ).then((res) => res.json());
 
@@ -268,8 +267,8 @@ export class Kupmios implements Provider {
   private async ogmiosWsp(
     methodname: string,
     args: unknown,
-  ): Promise<dntShim.WebSocket> {
-    const client = new dntShim.WebSocket(this.ogmiosUrl);
+  ): Promise<WebSocket> {
+    const client = new WebSocket(this.ogmiosUrl);
     await new Promise((res) => {
       client.addEventListener("open", () => res(1), { once: true });
     });

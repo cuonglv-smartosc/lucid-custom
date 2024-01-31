@@ -1,4 +1,3 @@
-import * as dntShim from "../../_dnt.shims.js";
 import { C } from "../core/mod.js";
 import { fromHex, fromUnit, toHex } from "../utils/mod.js";
 export class Kupmios {
@@ -68,7 +67,7 @@ export class Kupmios {
         const queryPredicate = isAddress
             ? addressOrCredential
             : addressOrCredential.hash;
-        const result = await dntShim.fetch(`${this.kupoUrl}/matches/${queryPredicate}${isAddress ? "" : "/*"}?unspent`)
+        const result = await fetch(`${this.kupoUrl}/matches/${queryPredicate}${isAddress ? "" : "/*"}?unspent`)
             .then((res) => res.json());
         return this.kupmiosUtxosToUtxos(result);
     }
@@ -78,13 +77,13 @@ export class Kupmios {
             ? addressOrCredential
             : addressOrCredential.hash;
         const { policyId, assetName } = fromUnit(unit);
-        const result = await dntShim.fetch(`${this.kupoUrl}/matches/${queryPredicate}${isAddress ? "" : "/*"}?unspent&policy_id=${policyId}${assetName ? `&asset_name=${assetName}` : ""}`)
+        const result = await fetch(`${this.kupoUrl}/matches/${queryPredicate}${isAddress ? "" : "/*"}?unspent&policy_id=${policyId}${assetName ? `&asset_name=${assetName}` : ""}`)
             .then((res) => res.json());
         return this.kupmiosUtxosToUtxos(result);
     }
     async getUtxoByUnit(unit) {
         const { policyId, assetName } = fromUnit(unit);
-        const result = await dntShim.fetch(`${this.kupoUrl}/matches/${policyId}.${assetName ? `${assetName}` : "*"}?unspent`)
+        const result = await fetch(`${this.kupoUrl}/matches/${policyId}.${assetName ? `${assetName}` : "*"}?unspent`)
             .then((res) => res.json());
         const utxos = await this.kupmiosUtxosToUtxos(result);
         if (utxos.length > 1) {
@@ -95,7 +94,7 @@ export class Kupmios {
     async getUtxosByOutRef(outRefs) {
         const queryHashes = [...new Set(outRefs.map((outRef) => outRef.txHash))];
         const utxos = await Promise.all(queryHashes.map(async (txHash) => {
-            const result = await dntShim.fetch(`${this.kupoUrl}/matches/*@${txHash}?unspent`).then((res) => res.json());
+            const result = await fetch(`${this.kupoUrl}/matches/*@${txHash}?unspent`).then((res) => res.json());
             return this.kupmiosUtxosToUtxos(result);
         }));
         return utxos.reduce((acc, utxos) => acc.concat(utxos), []).filter((utxo) => outRefs.some((outRef) => utxo.txHash === outRef.txHash && utxo.outputIndex === outRef.outputIndex));
@@ -122,7 +121,7 @@ export class Kupmios {
         });
     }
     async getDatum(datumHash) {
-        const result = await dntShim.fetch(`${this.kupoUrl}/datums/${datumHash}`).then((res) => res.json());
+        const result = await fetch(`${this.kupoUrl}/datums/${datumHash}`).then((res) => res.json());
         if (!result || !result.datum) {
             throw new Error(`No datum found for datum hash: ${datumHash}`);
         }
@@ -131,7 +130,7 @@ export class Kupmios {
     awaitTx(txHash, checkInterval = 3000) {
         return new Promise((res) => {
             const confirmation = setInterval(async () => {
-                const isConfirmed = await dntShim.fetch(`${this.kupoUrl}/matches/*@${txHash}?unspent`).then((res) => res.json());
+                const isConfirmed = await fetch(`${this.kupoUrl}/matches/*@${txHash}?unspent`).then((res) => res.json());
                 if (isConfirmed && isConfirmed.length > 0) {
                     clearInterval(confirmation);
                     await new Promise((res) => setTimeout(() => res(1), 1000));
@@ -180,7 +179,7 @@ export class Kupmios {
                     : null,
                 scriptRef: utxo.script_hash &&
                     (await (async () => {
-                        const { script, language, } = await dntShim.fetch(`${this.kupoUrl}/scripts/${utxo.script_hash}`).then((res) => res.json());
+                        const { script, language, } = await fetch(`${this.kupoUrl}/scripts/${utxo.script_hash}`).then((res) => res.json());
                         if (language === "native") {
                             return { type: "Native", script };
                         }
@@ -201,7 +200,7 @@ export class Kupmios {
         }));
     }
     async ogmiosWsp(methodname, args) {
-        const client = new dntShim.WebSocket(this.ogmiosUrl);
+        const client = new WebSocket(this.ogmiosUrl);
         await new Promise((res) => {
             client.addEventListener("open", () => res(1), { once: true });
         });
