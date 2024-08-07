@@ -1,5 +1,5 @@
 import { C } from "../core/mod.js";
-import { fromHex, fromUnit, toHex } from "../utils/mod.js";
+import { fromHex, fromUnit, toHex, costModelKeys } from "../utils/mod.js";
 export class Kupmios {
   /**
    * @param kupoUrl: http(s)://localhost:1442
@@ -34,27 +34,33 @@ export class Kupmios {
             const { result } = JSON.parse(msg.data);
             // deno-lint-ignore no-explicit-any
             const costModels = {};
-            Object.keys(result.costModels).forEach((v) => {
+            Object.keys(result.plutusCostModels).forEach((v) => {
               const version = v.split(":")[1].toUpperCase();
               const plutusVersion = "Plutus" + version;
-              costModels[plutusVersion] = result.costModels[v];
+              costModels[plutusVersion] = Object.fromEntries(
+                result.plutusCostModels[v].map((val, idx) => [
+                  costModelKeys[plutusVersion][idx],
+                  val,
+                ])
+              );
             });
-            const [memNum, memDenom] = result.prices.memory.split("/");
-            const [stepsNum, stepsDenom] = result.prices.steps.split("/");
+            const [memNum, memDenom] =
+              result.scriptExecutionPrices.memory.split("/");
+            const [stepsNum, stepsDenom] =
+              result.scriptExecutionPrices.cpu.split("/");
+
             res({
               minFeeA: parseInt(result.minFeeCoefficient),
-              minFeeB: parseInt(result.minFeeConstant),
-              maxTxSize: parseInt(result.maxTxSize),
-              maxValSize: parseInt(result.maxValueSize),
-              keyDeposit: BigInt(result.stakeKeyDeposit),
-              poolDeposit: BigInt(result.poolDeposit),
+              minFeeB: parseInt(result.minFeeConstant.ada.lovelace),
+              maxTxSize: parseInt(result.maxTransactionSize.bytes),
+              maxValSize: parseInt(result.maxValueSize.bytes),
+              keyDeposit: BigInt(result.stakeCredentialDeposit.ada.lovelace),
+              poolDeposit: BigInt(result.stakePoolDeposit.ada.lovelace),
               priceMem: parseInt(memNum) / parseInt(memDenom),
               priceStep: parseInt(stepsNum) / parseInt(stepsDenom),
               maxTxExMem: BigInt(result.maxExecutionUnitsPerTransaction.memory),
-              maxTxExSteps: BigInt(
-                result.maxExecutionUnitsPerTransaction.steps
-              ),
-              coinsPerUtxoByte: BigInt(result.coinsPerUtxoByte),
+              maxTxExSteps: BigInt(result.maxExecutionUnitsPerTransaction.cpu),
+              coinsPerUtxoByte: BigInt(result.minUtxoDepositCoefficient),
               collateralPercentage: parseInt(result.collateralPercentage),
               maxCollateralInputs: parseInt(result.maxCollateralInputs),
               costModels,
@@ -124,7 +130,7 @@ export class Kupmios {
     const client = await this.ogmiosWsp(
       "queryLedgerState/rewardAccountSummaries",
       {
-        scripts: [rewardAddress],
+        keys: [rewardAddress],
       }
     );
     return new Promise((res, rej) => {
@@ -180,7 +186,7 @@ export class Kupmios {
         (msg) => {
           try {
             const { result } = JSON.parse(msg.data);
-            if (result.SubmitSuccess) res(result.SubmitSuccess.txId);
+            if (result && result.transaction) res(result.transaction.id);
             else rej(result.SubmitFail);
             client.close();
           } catch (e) {
