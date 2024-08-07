@@ -185,9 +185,10 @@ export class Kupmios {
         "message",
         (msg) => {
           try {
-            const { result } = JSON.parse(msg.data);
-            if (result && result.transaction) res(result.transaction.id);
-            else rej(result.SubmitFail);
+            const response = JSON.parse(msg.data);
+            if (response.result && response.result.transaction)
+              res(result.transaction.id);
+            else rej(response.error);
             client.close();
           } catch (e) {
             rej(e);
