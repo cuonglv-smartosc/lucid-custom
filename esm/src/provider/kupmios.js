@@ -37,6 +37,7 @@ export class Kupmios {
             Object.keys(result.plutusCostModels).forEach((v) => {
               const version = v.split(":")[1].toUpperCase();
               const plutusVersion = "Plutus" + version;
+              if (version == "V3") return;
               costModels[plutusVersion] = Object.fromEntries(
                 result.plutusCostModels[v].map((val, idx) => [
                   costModelKeys[plutusVersion][idx],
