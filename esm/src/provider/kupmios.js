@@ -52,7 +52,7 @@ export class Kupmios {
 
             res({
               minFeeA: parseInt(result.minFeeCoefficient),
-              minFeeB: parseInt(result.minFeeConstant.ada.lovelace),
+              minFeeB: parseInt(result.minFeeConstant.ada.lovelace) + 1000000,
               maxTxSize: parseInt(result.maxTransactionSize.bytes),
               maxValSize: parseInt(result.maxValueSize.bytes),
               keyDeposit: BigInt(result.stakeCredentialDeposit.ada.lovelace),
